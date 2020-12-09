@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "896399952076",
+    "firebase_url": "https://housecleaning-48afb.firebaseio.com",
+    "project_id": "housecleaning-48afb",
+    "storage_bucket": "housecleaning-48afb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:896399952076:android:40391a29ac7166b3a89a69",
+        "android_client_info": {
+          "package_name": "com.example.HouseCleaning"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "896399952076-7h99k2e7s8k3q6ol045ium0dtc1ql26t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.HouseCleaning",
+            "certificate_hash": "a7bfc71f59773de9ed0924c3d6b26c6d2d57e2cb"
+          }
+        },
+        {
+          "client_id": "896399952076-evlbq6laph2fk33igbu9u3f5bt6tlnsr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFum17ZaV0yCVS6ToxlXYoXcNoR107cY4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "896399952076-evlbq6laph2fk33igbu9u3f5bt6tlnsr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
