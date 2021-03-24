@@ -1,12 +1,22 @@
+import 'package:HouseCleaning/market/historyOder.dart';
 import 'package:HouseCleaning/services/Tests.dart';
+import 'package:HouseCleaning/shipPage/ScanScreen.dart';
+import 'package:HouseCleaning/shipPage/shipPape.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'Home/HomePagev2.dart';
 import 'Home/NavigationHomeScreen.dart';
+import 'Login/FormPage.dart';
 import 'Login/LoginPhone.dart';
 import 'Login/ProfilePage.dart';
+import 'PageShip/HomeShipPage.dart';
+import 'PageShip/PageShip.dart';
+import 'PageShip/ShipComponent.dart';
+import 'market/historyOders.dart';
 import 'market/marketPage.dart';
+import 'market/oder.dart';
+import 'market/orderPage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -8,9 +8,9 @@ import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 
 class HomePageV2 extends StatefulWidget {
-  final String phoneNumber;
+  var dataUser;
 
-  HomePageV2({@required this.phoneNumber});
+  HomePageV2({@required this.dataUser});
   @override
   _HomePageV2State createState() => _HomePageV2State();
 }
@@ -37,18 +37,18 @@ class _HomePageV2State extends State<HomePageV2> {
 
   var dataUser;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  void getData() {
-    print("widget.phoneNumber");
-    firestore
-        .collection("users")
-        .doc(widget.phoneNumber.toString().startsWith("0")
-            ? widget.phoneNumber.substring(1)
-            : widget.phoneNumber)
-        .get()
-        .then((querySnapshot) {
-      dataUser = querySnapshot.data();
-    });
-  }
+  // void getData() {
+  //   print("widget.phoneNumber");
+  //   firestore
+  //       .collection("users")
+  //       .doc(widget.phoneNumber.toString().startsWith("0")
+  //           ? widget.phoneNumber.substring(1)
+  //           : widget.phoneNumber)
+  //       .get()
+  //       .then((querySnapshot) {
+  //     dataUser = querySnapshot.data();
+  //   });
+  // }
 
   bool loading = false;
   Timer timer;
@@ -65,8 +65,10 @@ class _HomePageV2State extends State<HomePageV2> {
   @override
   void initState() {
     this._makeGetRequest();
-    getData();
+    // getData();
     timerLoading();
+    print(widget.dataUser);
+    print("widget.dataUser");
     // timer = Timer.periodic(Duration(seconds: 3), (Timer t) => timerLoading());
   }
 
@@ -84,7 +86,7 @@ class _HomePageV2State extends State<HomePageV2> {
         ),
         centerTitle: false,
         title: Text(
-          dataUser == null ? " " : dataUser['full_name'],
+          widget.dataUser == null ? " " : widget.dataUser['full_name'],
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,

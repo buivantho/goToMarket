@@ -1,48 +1,57 @@
 import 'dart:async';
 import 'dart:convert';
-
+import 'package:HouseCleaning/market/timeBookManyDays.dart';
+import 'package:HouseCleaning/repository/repository_service_todo.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gradient_app_bar/gradient_app_bar.dart';
 import 'package:http/http.dart';
 
+import 'historyOder.dart';
+import 'orderPage.dart';
+
 class MarketPage extends StatefulWidget {
+  var dataUser;
+  var databook;
+  var timebook;
+  MarketPage({@required this.dataUser, this.databook, this.timebook});
   @override
   _MarketPageState createState() => _MarketPageState();
 }
 
 int _n;
+var dataUser;
+var databook;
+var timebook;
 
 class _MarketPageState extends State<MarketPage> {
   final List<String> imgList = [
-    'https://images.unsplash.com/photo-1520342868574-5fa3804e551c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=6ff92caffcdd63681a35134a6770ed3b&auto=format&fit=crop&w=1951&q=80',
-    'https://images.unsplash.com/photo-1522205408450-add114ad53fe?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=368f45b0888aeb0b7b08e3a1084d3ede&auto=format&fit=crop&w=1950&q=80',
-    'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=94a1e718d89ca60a6337a6008341ca50&auto=format&fit=crop&w=1950&q=80',
-    'https://images.unsplash.com/photo-1523205771623-e0faa4d2813d?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=89719a0d55dd05e2deae4120227e6efc&auto=format&fit=crop&w=1953&q=80',
-    'https://images.unsplash.com/photo-1508704019882-f9cf40e475b4?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=8c6e5e3aba713b17aa1fe71ab4f0ae5b&auto=format&fit=crop&w=1352&q=80',
-    'https://images.unsplash.com/photo-1519985176271-adb1088fa94c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=a0c8d632e977f94e5d312d9893258f59&auto=format&fit=crop&w=1355&q=80'
+    'https://chupanhmonan.com/wp-content/uploads/2018/10/chup-anh-mon-an-chuyen-nghiep-tu-liam-min-min.jpg',
+    'https://www.chapter3d.com/wp-content/uploads/2020/06/anh-do-an.jpg',
+    'https://azstudio.vn/wp-content/uploads/2020/03/CHU%CC%A3P-A%CC%89NH-SA%CC%89N-PHA%CC%82%CC%89M-13-1.jpg',
+    'https://azstudio.vn/wp-content/uploads/2020/03/CHU%CC%A3P-A%CC%89NH-SA%CC%89N-PHA%CC%82%CC%89M-13-1.jpg',
+    'https://azstudio.vn/wp-content/uploads/2020/03/CHU%CC%A3P-A%CC%89NH-SA%CC%89N-PHA%CC%82%CC%89M-13-1.jpg',
+    'https://azstudio.vn/wp-content/uploads/2020/03/CHU%CC%A3P-A%CC%89NH-SA%CC%89N-PHA%CC%82%CC%89M-13-1.jpg'
   ];
-  // List data;
-  // List datas;
-  // // final TextEditingController _searchQuery = new TextEditingController();
-  // Future<String> _makeGetRequest() async {
-  //   // tạo GET request
-  //   String url = 'https://jsonplaceholder.typicode.com/users';
-  //   Response response = await get(url);
-  //   // data sample trả về trong response
-  //   int statusCode = response.statusCode;
-  //   Map<String, String> headers = response.headers;
-  //   String contentType = headers['content-type'];
-  //   this.setState(() {
-  //     data = json.decode(response.body);
-  //     datas = data;
-  //     print(data);
-  //   });
-  //   // Thực hiện convert json to object...
-  // }
-
+  List dataSearch = [];
+  List dataMarket = []; //laf chinhs
+  List dataMaker = [];
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  void getData() {
+    FirebaseFirestore.instance
+        .collection('maker')
+        .get()
+        .then((QuerySnapshot querySnapshot) => {
+              querySnapshot.docs.forEach((doc) {
+                if (doc.data()['status'] == 0) {
+                  dataMaker.add(doc.data());
+                }
+              })
+            });
+  }
   // SearchBar searchBar;
 
   bool loading = false;
@@ -62,12 +71,14 @@ class _MarketPageState extends State<MarketPage> {
   @override
   void initState() {
     super.initState();
-    print(objsearch);
-    dataMarket = dataMarketss;
-    print(data);
+    print("databook.toString()");
+    print(widget.databook);
+    setState(() {
+      dataSearch = dataMaker;
+      dataMarket = dataSearch;
+    });
     _n = 1;
-    // dataMarket = liveFood;
-    // this._makeGetRequest();
+    getData();
     timer = Timer.periodic(Duration(seconds: 3), (Timer t) => timerLoading());
   }
 
@@ -75,10 +86,31 @@ class _MarketPageState extends State<MarketPage> {
   Icon actionIcon = new Icon(Icons.search);
   @override
   Widget build(BuildContext context) {
-    // print(dataMarket);
+    print(dataMarket.length);
+
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: new GradientAppBar(
+            leading: IconButton(
+                icon: Icon(
+                  FontAwesomeIcons.cartArrowDown,
+                  color: Colors.white,
+                  size: 20.0,
+                ),
+                onPressed: () => databook == null
+                    ? Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => HistoryOder(
+                                  dataUser: widget.dataUser,
+                                )))
+                    : Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TimeBookManyDays(
+                            dataUser: widget.dataUser,
+                          ),
+                        ))),
             centerTitle: true,
             title: appBarTitle,
             gradient: LinearGradient(
@@ -99,7 +131,7 @@ class _MarketPageState extends State<MarketPage> {
                       this.appBarTitle = new TextField(
                         onChanged: (string) {
                           setState(() {
-                            dataMarket = dataMarketss
+                            dataMarket = dataSearch
                                 .where((value) => (value['name_product']
                                     .toLowerCase()
                                     .contains(string.toLowerCase())))
@@ -115,15 +147,15 @@ class _MarketPageState extends State<MarketPage> {
                         decoration: new InputDecoration(
                             prefixIcon:
                                 new Icon(Icons.search, color: Colors.white),
-                            hintText: "Tên sân bóng",
+                            hintText: "Tìm kiếm đồ ăn",
                             hintStyle: new TextStyle(color: Colors.white)),
                       );
                     } else {
                       setState(() {
-                        dataMarket = dataMarketss;
+                        dataMarket = dataMaker;
                       });
                       this.actionIcon = new Icon(Icons.search);
-                      this.appBarTitle = new Text("ĐẶT SÂN BÓNG");
+                      this.appBarTitle = new Text("");
                     }
                   });
                 },
@@ -168,9 +200,9 @@ class _MarketPageState extends State<MarketPage> {
                       itemBuilder: (BuildContext context, int index) =>
                           GestureDetector(
                         onTap: () {
-                          setState(() {
-                            pushArrToList(listMarket[index]);
-                          });
+                          // setState(() {
+                          //   pushArrToList(listMarket[index]);
+                          // });
                         },
                         child: Container(
                             width: MediaQuery.of(context).size.width * 0.20,
@@ -238,12 +270,12 @@ class _MarketPageState extends State<MarketPage> {
                                         border: Border.all(
                                             color: Colors.white, width: 1)),
                                     child: GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          _deleteObjsearch(objsearch[index]);
-                                          // print("123123");
-                                        });
-                                      },
+                                      // onTap: () {
+                                      //   setState(() {
+                                      //     _deleteObjsearch(objsearch[index]);
+                                      //     // print("123123");
+                                      //   });
+                                      // },
                                       child: Icon(
                                         FontAwesomeIcons.times,
                                         color: Colors.red,
@@ -283,215 +315,26 @@ class _MarketPageState extends State<MarketPage> {
                       : GestureDetector(
                           onTap: () {
                             setState(() {
-                              priceSumCount = dataMarket[index]['price'];
-                            });
-                            print(dataMarket[index]['images'].length);
-                            showModalBottomSheet<void>(
-                              isScrollControlled: true,
-                              context: context,
+                              print(widget.dataUser);
+                              print("dataUser");
 
-                              // backgroundColor: Colo rs.grey[200],
-                              builder: (BuildContext context) {
-                                return Container(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                          begin: Alignment.bottomRight,
-                                          end: Alignment.topLeft,
-                                          colors: [
-                                            Color.fromRGBO(255, 164, 128, 1),
-                                            Color.fromRGBO(247, 114, 62, 1),
-                                          ]),
-                                    ),
-                                    height: MediaQuery.of(context).size.height *
-                                        0.80,
-                                    // color: Colors.amber,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        Container(
-                                            child: new Swiper(
-                                          itemBuilder: (BuildContext context,
-                                              int indexs) {
-                                            return new Image.asset(
-                                              dataMarket[index]['images']
-                                                  [indexs]['img'],
-                                              fit: BoxFit.cover,
-                                            );
-                                          },
-                                          itemCount: dataMarket[index]['images']
-                                              .length,
-                                          itemWidth: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.95,
-                                          itemHeight: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.40,
-                                          viewportFraction: 0.8,
-                                          scale: 0.9,
-                                          layout: SwiperLayout.STACK,
-                                        )),
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                dataMarket[index]
-                                                    ['name_product'],
-                                                style: TextStyle(
-                                                    fontSize: 20.0,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              Text(
-                                                dataMarket[index]['price']
-                                                        .toString() +
-                                                    'Đ/' +
-                                                    dataMarket[index]['scales']
-                                                        .toString() +
-                                                    dataMarket[index]['unit'],
-                                                style: TextStyle(
-                                                    fontSize: 15.0,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 120.0,
-                                                right: 120.0,
-                                                top: 50.0,
-                                                bottom: 50.0),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Container(
-                                                  width: 35.0,
-                                                  height: 35.0,
-                                                  decoration: BoxDecoration(
-                                                      color: Colors.white,
-                                                      shape: BoxShape.rectangle,
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                              Radius.circular(
-                                                                  100.0))),
-                                                  child: GestureDetector(
-                                                      onTap: () {
-                                                        add(dataMarket[index]
-                                                            ['price']);
-                                                      },
-                                                      child: Icon(
-                                                        FontAwesomeIcons.plus,
-                                                        color: Colors.green,
-                                                        size: 25.0,
-                                                      )),
-                                                ),
-                                                Text(
-                                                  '$_n'.toString(),
-                                                  style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 25.0,
-                                                      fontWeight:
-                                                          FontWeight.w700),
-                                                ),
-                                                Container(
-                                                  width: 35.0,
-                                                  height: 35.0,
-                                                  decoration: BoxDecoration(
-                                                      color: Colors.white,
-                                                      shape: BoxShape.rectangle,
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                              Radius.circular(
-                                                                  100.0))),
-                                                  child: GestureDetector(
-                                                      onTap: () {
-                                                        minus(dataMarket[index]
-                                                            ['price']);
-                                                      },
-                                                      child: Icon(
-                                                        FontAwesomeIcons.minus,
-                                                        color: Colors.green,
-                                                        size: 25.0,
-                                                      )),
-                                                ),
-                                              ],
-                                            )),
-                                        Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  Navigator.of(context).pop();
-                                                });
-                                              },
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(50),
-                                                  gradient: LinearGradient(
-                                                      begin:
-                                                          Alignment.topCenter,
-                                                      end: Alignment
-                                                          .bottomCenter,
-                                                      colors: [
-                                                        Color.fromRGBO(
-                                                            255, 164, 128, 1),
-                                                        Color.fromRGBO(
-                                                            247, 114, 62, 1),
-                                                      ]),
-                                                ),
-                                                width: 500.0,
-                                                height: 50.0,
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        _n.toString() + " Món",
-                                                        style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 20.0),
-                                                      ),
-                                                      Text(
-                                                        "Thêm vào giỏ",
-                                                        style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 20.0),
-                                                      ),
-                                                      Text(
-                                                        priceSumCount
-                                                                .toString() +
-                                                            "Đ",
-                                                        style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 20.0),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            )),
-                                      ],
-                                    ));
-                              },
-                            );
+                              // priceSumCount = dataMarket[index];
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => OrderPage(
+                                            data: dataMarket[index],
+                                            dataUser: widget.dataUser,
+                                            databook: widget.databook,
+                                            timebook: widget.timebook,
+                                          )));
+                            });
+                            // print(dataMarket[index]['images'].length);
                           },
                           child: Row(
                             children: <Widget>[
                               Image.asset(
+                                // "assets/images/loadingss.png",
                                 dataMarket[index]['image'],
                                 width: 130.0,
                                 height: 100.0,
@@ -583,10 +426,7 @@ class _MarketPageState extends State<MarketPage> {
                                             fontWeight: FontWeight.w700),
                                       ),
                                       Text(
-                                        "/" +
-                                            dataMarket[index]['scales']
-                                                .toString() +
-                                            dataMarket[index]['unit'],
+                                        "/" + "1" + dataMarket[index]['unit'],
                                         style: TextStyle(
                                             fontSize: 10.0,
                                             fontWeight: FontWeight.w700),
@@ -607,7 +447,7 @@ class _MarketPageState extends State<MarketPage> {
                                         width: 5.0,
                                       ),
                                       Text(
-                                        dataMarket[index]['addres'],
+                                        dataMarket[index]['address'],
                                         style: TextStyle(
                                             fontSize: 10.0,
                                             fontWeight: FontWeight.w700),
@@ -669,109 +509,6 @@ class _MarketPageState extends State<MarketPage> {
     print(context);
   }
 
-  List dataLive = [
-    {
-      "id_product": 5,
-      "id": 3,
-      "name_product": "Thịt lợnssssssssssssss",
-      "scales": 10,
-      "unit": "KG",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 5,
-      "price": 200.000,
-      "sale_percent": 50,
-      "name_sale": "THODZ",
-      "image": "assets/images/giavi.jpg",
-      "phone": 8427966332
-    },
-    {
-      "id_product": 5,
-      "id": 1,
-      "name_product": "Tôm",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 100,
-      "unit": "G",
-      "price": 100.000,
-      "sale_percent": 50,
-      "name_sale": "THODZ",
-      "image": "assets/images/raucu.jpg",
-      "phone": 8427966332
-    },
-    {
-      "id_product": 1,
-      "id": 2,
-      "name_product": "Cá rô",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 1,
-      "unit": "KG",
-      "price": 500.000,
-      "sale_price": 10.000,
-      "name_sale": "THODZ",
-      "image": "assets/images/hoaqua.jpg",
-      "phone": 8427966332
-    },
-    {
-      "id_product": 1,
-      "id": 3,
-      "name_product": "Gà ta",
-      "scales": 10,
-      "unit": "KG",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 5,
-      "price": 200.000,
-      "sale_percent": 50,
-      "name_sale": "THODZ",
-      "image": "assets/images/giavi.jpg",
-      "phone": 8427966332
-    }
-  ];
-
-  List cookedFood = [
-    {
-      "id_product": 3,
-      "id": 3,
-      "name_product": "Gà rán",
-      "scales": 10,
-      "unit": "KG",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 5,
-      "price": 200.000,
-      "sale_percent": 50,
-      "name_sale": "THODZ",
-      "image": "assets/images/giavi.jpg",
-      "phone": 8427966332
-    },
-    {
-      "id_product": 4,
-      "id": 1,
-      "name_product": "Gà",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 100,
-      "unit": "G",
-      "price": 100.000,
-      "sale_percent": 50,
-      "name_sale": "THODZ",
-      "image": "assets/images/setlau.jpg",
-      "phone": 8427966332
-    },
-    {
-      "id_product": 5,
-      "id": 2,
-      "name_product": "Cá",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 1,
-      "unit": "KG",
-      "price": 500.000,
-      "sale_price": 10.000,
-      "name_sale": "THODZ",
-      "image": "assets/images/dochin.png",
-      "phone": 8427966332
-    },
-  ];
   List listMarket = [
     {
       "nameItem": "ĐỒ SỐNG",
@@ -816,342 +553,6 @@ class _MarketPageState extends State<MarketPage> {
       "img": "assets/images/mamco.jpg"
     },
   ];
-  List testobj = [
-    {
-      "id_product": 3,
-      "id": 1,
-      "name_product": "Gà rán",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 100,
-      "unit": "G",
-      "price": 100.000,
-      "sale_percent": 50,
-      "name_sale": "THODZ",
-      "image": "assets/images/raucu.jpg",
-      "phone": 8427966332
-    },
-    {
-      "id_product": 1,
-      "id": 2,
-      "name_product": "Gà rán",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 1,
-      "unit": "KG",
-      "price": 500.000,
-      "sale_price": 10.000,
-      "name_sale": "THODZ",
-      "image": "assets/images/hoaqua.jpg",
-      "phone": 8427966332
-    },
-    {
-      "id_product": 2,
-      "id": 3,
-      "name_product": "Gà rán",
-      "scales": 10,
-      "unit": "KG",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 5,
-      "price": 200.000,
-      "sale_percent": 50,
-      "name_sale": "THODZ",
-      "image": "assets/images/giavi.jpg",
-      "phone": 8427966332
-    },
-    {
-      "id_product": 1,
-      "id": 1,
-      "name_product": "Gà rán",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 100,
-      "unit": "G",
-      "price": 100.000,
-      "sale_percent": 50,
-      "name_sale": "THODZ",
-      "image": "assets/images/raucu.jpg",
-      "phone": 8427966332
-    },
-    {
-      "id_product": 3,
-      "id": 2,
-      "name_product": "Gà rán",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 1,
-      "unit": "KG",
-      "price": 500.000,
-      "sale_price": 10.000,
-      "name_sale": "THODZ",
-      "image": "assets/images/hoaqua.jpg",
-      "phone": 8427966332
-    },
-  ];
-  List dataMarket = [];
-  List dataMarketss = [
-    {
-      "id_product": 3,
-      "id": 1,
-      "name_product": "Gà ránsssssssssssssssssss",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 100,
-      "unit": "G",
-      "price": 100.000,
-      "sale_percent": 50,
-      "name_sale": "THODZ",
-      "image": "assets/images/raucu.jpg",
-      "phone": 8427966332,
-      "images": [
-        {"img": "assets/images/raucu.jpg"},
-        {"img": "assets/images/giavi.jpg"},
-        {"img": "assets/images/setlau.jpg"},
-        {"img": "assets/images/raucu.jpg"},
-        {"img": "assets/images/mamco.jpg"},
-      ]
-    },
-    {
-      "id_product": 1,
-      "id": 2,
-      "name_product": "Cá",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 1,
-      "unit": "KG",
-      "price": 500.000,
-      "sale_price": 10.000,
-      "name_sale": "THODZ",
-      "image": "assets/images/hoaqua.jpg",
-      "phone": 8427966332,
-      "images": [
-        {"img": "assets/images/raucu.jpg"},
-        {"img": "assets/images/giavi.jpg"},
-        {"img": "assets/images/setlau.jpg"},
-      ]
-    },
-    {
-      "id_product": 2,
-      "id": 3,
-      "name_product": "Gà rán",
-      "scales": 10,
-      "unit": "KG",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 5,
-      "price": 200.000,
-      "sale_percent": 50,
-      "name_sale": "THODZ",
-      "image": "assets/images/giavi.jpg",
-      "phone": 8427966332,
-      "images": [
-        {"img": "assets/images/giavi.jpg"},
-      ]
-    },
-    {
-      "id_product": 1,
-      "id": 1,
-      "name_product": "Thịt lợn",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 100,
-      "unit": "G",
-      "price": 100.000,
-      "sale_percent": 50,
-      "name_sale": "THODZ",
-      "image": "assets/images/raucu.jpg",
-      "phone": 8427966332,
-      "images": [
-        {"img": "assets/images/giavi.jpg"},
-      ]
-    },
-    {
-      "id_product": 3,
-      "id": 2,
-      "name_product": "Gà rán",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 1,
-      "unit": "KG",
-      "price": 500.000,
-      "sale_price": 10.000,
-      "name_sale": "THODZ",
-      "image": "assets/images/hoaqua.jpg",
-      "phone": 8427966332,
-      "images": [
-        {"img": "assets/images/giavi.jpg"},
-      ]
-    },
-    {
-      "id_product": 3,
-      "id": 1,
-      "name_product": "Cá chép",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 100,
-      "unit": "G",
-      "price": 100.000,
-      "sale_percent": 50,
-      "name_sale": "THODZ",
-      "image": "assets/images/raucu.jpg",
-      "phone": 8427966332,
-      "images": [
-        {"img": "assets/images/giavi.jpg"},
-      ]
-    },
-    {
-      "id_product": 1,
-      "id": 2,
-      "name_product": "Gà rán",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 1,
-      "unit": "KG",
-      "price": 500.000,
-      "sale_price": 10.000,
-      "name_sale": "THODZ",
-      "image": "assets/images/hoaqua.jpg",
-      "phone": 8427966332,
-      "images": [
-        {"img": "assets/images/giavi.jpg"},
-      ]
-    },
-    {
-      "id_product": 2,
-      "id": 3,
-      "name_product": "Gà rán",
-      "scales": 10,
-      "unit": "KG",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 5,
-      "price": 200.000,
-      "sale_percent": 50,
-      "name_sale": "THODZ",
-      "image": "assets/images/giavi.jpg",
-      "phone": 8427966332,
-      "images": [
-        {"img": "assets/images/giavi.jpg"},
-      ]
-    },
-    {
-      "id_product": 1,
-      "id": 1,
-      "name_product": "Gà rán",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 100,
-      "unit": "G",
-      "price": 100.000,
-      "sale_percent": 50,
-      "name_sale": "THODZ",
-      "image": "assets/images/raucu.jpg",
-      "phone": 8427966332,
-      "images": [
-        {"img": "assets/images/giavi.jpg"},
-      ]
-    },
-    {
-      "id_product": 4,
-      "id": 2,
-      "name_product": "bi",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 1,
-      "unit": "KG",
-      "price": 500.000,
-      "sale_price": 10.000,
-      "name_sale": "THODZ",
-      "image": "assets/images/hoaqua.jpg",
-      "phone": 8427966332,
-      "images": [
-        {"img": "assets/images/giavi.jpg"},
-      ]
-    },
-    {
-      "id_product": 3,
-      "id": 1,
-      "name_product": "Gà rán",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 100,
-      "unit": "G",
-      "price": 100.000,
-      "sale_percent": 50,
-      "name_sale": "THODZ",
-      "image": "assets/images/raucu.jpg",
-      "phone": 8427966332,
-      "images": [
-        {"img": "assets/images/giavi.jpg"},
-      ]
-    },
-    {
-      "id_product": 1,
-      "id": 2,
-      "name_product": "Gà rán",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 1,
-      "unit": "KG",
-      "price": 500.000,
-      "sale_price": 10.000,
-      "name_sale": "THODZ",
-      "image": "assets/images/hoaqua.jpg",
-      "phone": 8427966332,
-      "images": [
-        {"img": "assets/images/giavi.jpg"},
-      ]
-    },
-    {
-      "id_product": 5,
-      "id": 3,
-      "name_product": "Gà rán",
-      "scales": 10,
-      "unit": "KG",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 5,
-      "price": 200.000,
-      "sale_percent": 50,
-      "name_sale": "THODZ",
-      "image": "assets/images/giavi.jpg",
-      "phone": 8427966332,
-      "images": [
-        {"img": "assets/images/giavi.jpg"},
-      ]
-    },
-    {
-      "id_product": 1,
-      "id": 1,
-      "name_product": "Gà rán",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 100,
-      "unit": "G",
-      "price": 100.000,
-      "sale_percent": 50,
-      "name_sale": "THODZ",
-      "image": "assets/images/raucu.jpg",
-      "phone": 8427966332,
-      "images": [
-        {"img": "assets/images/giavi.jpg"},
-      ]
-    },
-    {
-      "id_product": 6,
-      "id": 2,
-      "name_product": "Gà rán",
-      "addres": "90 quán thánh , ba đình , hà nội",
-      "star": 3,
-      "scales": 1,
-      "unit": "KG",
-      "price": 500.000,
-      "sale_price": 10.000,
-      "name_sale": "THODZ",
-      "image": "assets/images/hoaqua.jpg",
-      "phone": 8427966332,
-      "images": [
-        {"img": "assets/images/giavi.jpg"},
-      ]
-    },
-  ];
 
   List objtest = [];
   Text _buildRatingStars(int rating) {
@@ -1186,63 +587,5 @@ class _MarketPageState extends State<MarketPage> {
       }
       ;
     });
-  }
-
-  void pushArrToList(datalistMarket) {
-    for (var i = 0; i < listMarket.length; i++) {
-      if (datalistMarket['id'] == listMarket[i]['id']) {
-        print(datalistMarket);
-        objsearch = [];
-        objsearch.add(datalistMarket);
-      }
-    }
-    for (var j = 0; j < objsearch.length; j++) {
-      if (objsearch[j]['id'] == 1) {
-        print("1");
-        dataMarket = dataMarketss
-            .where((item) =>
-                (item['id_product'].toString().contains(1.toString())))
-            .toList();
-      } else if (objsearch[j]['id'] == 2) {
-        print("1");
-        dataMarket = dataMarketss
-            .where((item) =>
-                (item['id_product'].toString().contains(2.toString())))
-            .toList();
-      } else if (objsearch[j]['id'] == 3) {
-        print("1");
-        dataMarket = dataMarketss
-            .where((item) =>
-                (item['id_product'].toString().contains(3.toString())))
-            .toList();
-      } else if (objsearch[j]['id'] == 4) {
-        print("1");
-        dataMarket = dataMarketss
-            .where((item) =>
-                (item['id_product'].toString().contains(4.toString())))
-            .toList();
-      } else if (objsearch[j]['id'] == 5) {
-        print("1");
-        dataMarket = dataMarketss
-            .where((item) =>
-                (item['id_product'].toString().contains(5.toString())))
-            .toList();
-      }
-    }
-  }
-
-  void _deleteObjsearch(dataObj) {
-    for (var i = 0; i < listMarket.length; i++) {
-      if (dataObj['id'] == listMarket[i]['id']) {
-        objsearch.remove(dataObj);
-        if (listMarket[i]['active'] == 1) {
-          listMarket[i]['active'] = 0;
-        }
-      }
-    }
-    dataMarket = dataMarketss
-        .where(
-            (item) => (item['id_product'].toString().contains("".toString())))
-        .toList();
   }
 }

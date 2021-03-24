@@ -54,6 +54,7 @@ CollectionReference users = FirebaseFirestore.instance.collection('users');
 //       .then((value) => print("User Added"))
 //       .catchError((error) => print("Failed to add user: $error"));
 // }
+var idGetWard;
 
 class ExampleNumber {
   int number;
@@ -195,7 +196,7 @@ class MapScreenState extends State<ProfilePage>
     print(phoneNumber.toString());
     print(fullName.text);
     print(sexValue);
-
+    print(idGetWard);
     print(datePicker.toString().replaceAll("00:00:00.000", ''));
     print(_dropDownValue);
     print(_dropDownValueDistrict);
@@ -204,6 +205,7 @@ class MapScreenState extends State<ProfilePage>
     return users
         .doc(phoneNumber.toString())
         .set({
+          'id_Ward': idGetWard.toString(),
           'full_name': fullName.text,
           'birthday': datePicker.toString().replaceAll("00:00:00.000", ''),
           'sex': sexValue,
@@ -308,10 +310,10 @@ class MapScreenState extends State<ProfilePage>
             child: ListView(
               children: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 25, 20, 4),
+                  padding: const EdgeInsets.fromLTRB(20, 5, 20, 4),
 
                   child: Container(
-                    height: 40,
+                    height: 60,
                     width: MediaQuery.of(context).size.width * 0.50,
                     child: new TextField(
                       style: TextStyle(fontSize: 18.0, color: Colors.white),
@@ -341,7 +343,7 @@ class MapScreenState extends State<ProfilePage>
                   // ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 25, 20, 4),
+                  padding: const EdgeInsets.fromLTRB(20, 5, 20, 4),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -854,7 +856,6 @@ class MapScreenState extends State<ProfilePage>
     // https://thongtindoanhnghiep.co/api/city/4/district
   }
 
-  var idGetWard;
   void _getWard(district) {
     print(district);
     setState(() {
@@ -863,7 +864,7 @@ class MapScreenState extends State<ProfilePage>
           idGetWard = dataDistrict[i]['ID'];
         }
       }
-
+      print(idGetWard.toString());
       // print(idGetWard);
       _makeGetRequestWard(idGetWard);
     });

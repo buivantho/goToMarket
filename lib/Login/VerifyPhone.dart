@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pin_put/pin_put.dart';
+import 'FormPage.dart';
 import 'ProfilePage.dart';
 import 'numeric_pad.dart';
 
@@ -14,6 +15,8 @@ class VerifyPhone extends StatefulWidget {
   @override
   _VerifyPhoneState createState() => _VerifyPhoneState();
 }
+
+
 
 class _VerifyPhoneState extends State<VerifyPhone> {
   final GlobalKey<ScaffoldState> _scaffoldkey = GlobalKey<ScaffoldState>();
@@ -237,7 +240,7 @@ class _VerifyPhoneState extends State<VerifyPhone> {
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
-                  builder: (context) => ProfilePage(
+                  builder: (context) => FormPage(
                         phoneNumber: widget.phoneNumber.toString(),
                       )),
               (route) => false);
@@ -261,7 +264,7 @@ class _VerifyPhoneState extends State<VerifyPhone> {
               Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => ProfilePage(
+                      builder: (context) => FormPage(
                             phoneNumber: widget.phoneNumber.toString(),
                           )),
                   (route) => false);

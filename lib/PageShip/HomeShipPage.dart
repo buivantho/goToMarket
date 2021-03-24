@@ -1,115 +1,46 @@
-import 'dart:io';
-
-import 'package:HouseCleaning/Home/infoPage.dart';
+import 'package:HouseCleaning/Home/HomePage.dart';
+import 'package:HouseCleaning/Home/bottom_bar.dart';
+import 'package:HouseCleaning/PageShip/information_ship.dart';
+import 'package:HouseCleaning/PageShip/statistical.dart';
 import 'package:HouseCleaning/market/marketPage.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'HomePage.dart';
-import 'HomePagev2.dart';
-import 'bottom_bar.dart';
 
-class MainPage extends StatefulWidget {
+import 'AreDelivered.dart';
+import 'ShipComponent.dart';
+
+class HomeShipPage extends StatefulWidget {
   final String phoneNumber;
 
-  MainPage({@required this.phoneNumber});
-
+  HomeShipPage({@required this.phoneNumber});
   @override
-  _MainPageState createState() => _MainPageState();
+  _HomeShipPageState createState() => _HomeShipPageState(phoneNumber);
 }
 
 enum BottomIcons { Home, Favorite, Search, Account }
 
-class _MainPageState extends State<MainPage> {
+class _HomeShipPageState extends State<HomeShipPage> {
+  var phoneNumber;
+  _HomeShipPageState(this.phoneNumber);
   BottomIcons bottomIcons = BottomIcons.Home;
-  var dataUser;
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  void getData() {
-    print("widget.phoneNumber");
-    firestore
-        .collection("users")
-        .doc(widget.phoneNumber.toString().startsWith("0")
-            ? widget.phoneNumber.substring(1)
-            : widget.phoneNumber)
-        .get()
-        .then((querySnapshot) {
-      setState(() {
-        dataUser = querySnapshot.data();
-      });
-    });
-  }
-
-  void getUserShip() {
-    FirebaseFirestore.instance
-        .collection('account')
-        .get()
-        .then((QuerySnapshot querySnapshot) => {
-              querySnapshot.docs.forEach((doc) {
-                setState(() {
-                  print(doc.data());
-                });
-              }),
-            });
-  }
-
   @override
-  void initState() {
-    super.initState();
-    setuoNotification();
-    getData();
-    print(dataUser);
-    print("dataUser");
-    getUserShip();
-  }
-
-  void setuoNotification() async {
-    final FirebaseMessaging _fcm = FirebaseMessaging();
-    Future initialise() async {
-      if (Platform.isIOS) {
-        _fcm.requestNotificationPermissions(IosNotificationSettings());
-      }
-      _fcm.configure(
-        onMessage: (Map<String, dynamic> message) {
-          print('onMessage : $message');
-        },
-        onLaunch: (Map<String, dynamic> message) {
-          print('onLaunch : $message');
-        },
-        onResume: (Map<String, dynamic> message) {
-          print('onResume : $message');
-        },
-      );
-    }
-  }
-
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: <Widget>[
           bottomIcons == BottomIcons.Home
-              ? Center(
-                  child: HomePageV2(
-                  dataUser: dataUser,
-                ))
+              ? Center(child: ShipComponent(phoneNumber: phoneNumber))
               : Container(),
           bottomIcons == BottomIcons.Favorite
-              ? Center(
-                  child: MarketPage(
-                  dataUser: dataUser,
-                ))
+              ? Center(child: AreDelivered(phoneNumber: phoneNumber))
               : Container(),
           bottomIcons == BottomIcons.Search
-              ? Center(child: MyHomePage())
+              ? Center(child: Statistical(phoneNumber: phoneNumber))
               : Container(),
           bottomIcons == BottomIcons.Account
-              ? Center(
-                  child: InfoPage(
-                  dataUser: dataUser,
-                ))
+              ? InformationShip(phoneNumber: phoneNumber)
               : Container(),
           Align(
             alignment: Alignment.bottomLeft,
@@ -127,7 +58,7 @@ class _MainPageState extends State<MainPage> {
                       bottomIcons:
                           bottomIcons == BottomIcons.Home ? true : false,
                       icons: EvaIcons.home,
-                      text: "TRANG CHỦ"),
+                      text: "ĐƠN HÀNG"),
                   BottomBar(
                       onPressed: () {
                         setState(() {
@@ -137,7 +68,7 @@ class _MainPageState extends State<MainPage> {
                       bottomIcons:
                           bottomIcons == BottomIcons.Favorite ? true : false,
                       icons: FontAwesomeIcons.shippingFast,
-                      text: "ĐẶT ĐỒ"),
+                      text: "ĐANG GIAO"),
                   BottomBar(
                       onPressed: () {
                         setState(() {
@@ -147,7 +78,7 @@ class _MainPageState extends State<MainPage> {
                       bottomIcons:
                           bottomIcons == BottomIcons.Search ? true : false,
                       icons: EvaIcons.search,
-                      text: "Search"),
+                      text: "Thông tin"),
                   BottomBar(
                       onPressed: () {
                         setState(() {
@@ -157,14 +88,13 @@ class _MainPageState extends State<MainPage> {
                       bottomIcons:
                           bottomIcons == BottomIcons.Account ? true : false,
                       icons: EvaIcons.personOutline,
-                      text: "Account"),
+                      text: "Tài khoản"),
                 ],
               ),
             ),
           )
         ],
       ),
-     
     );
   }
 }

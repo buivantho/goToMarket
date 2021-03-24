@@ -1,4 +1,5 @@
 import 'package:HouseCleaning/Home/NavigationHomeScreen.dart';
+import 'package:HouseCleaning/PageShip/PageShip.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -13,56 +14,88 @@ class LoginPhonePage extends StatefulWidget {
 }
 
 var dataUser;
+var datauserShip;
 
 class _LoginPhonePageState extends State<LoginPhonePage> {
   String phoneNumber = "";
   bool status = false;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+
   void getData() {
-    firestore
-        .collection("users")
-        .doc(phoneNumber.toString().startsWith("0")
-            ? phoneNumber.substring(1)
-            : phoneNumber)
-        .get()
-        .then((querySnapshot) {
-      dataUser = querySnapshot.data();
-      print(dataUser);
-      print(status);
-      if (dataUser == null) {
+    print(phoneNumber);
+    if (phoneNumber.length > 10) {
+      FirebaseFirestore.instance
+          .collection('account')
+          .doc(phoneNumber.toString())
+          .get()
+          .then((querySnapshot) {
         setState(() {
-          status = true;
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => VerifyPhone(
-                    phoneNumber: phoneNumber.toString().startsWith("0")
-                        ? phoneNumber.substring(1)
-                        : phoneNumber)),
-          );
+          datauserShip = querySnapshot.data();
         });
-      } else {
-        setState(() {
-          status = false;
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MainPage(
-                    phoneNumber: phoneNumber.toString().startsWith("0")
-                        ? phoneNumber.substring(1)
-                        : phoneNumber)),
-          );
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //       builder: (context) => MainPage(
-          //           phoneNumber: phoneNumber.toString().startsWith("0")
-          //               ? phoneNumber.substring(1)
-          //               : phoneNumber)),
-          // );
-        });
-      }
-    });
+        print(datauserShip);
+        if (datauserShip == null) {
+          Toast.show("Số điện thoại không tồn tại", context,
+              textColor: Colors.red,
+              backgroundColor: Colors.grey,
+              duration: Toast.LENGTH_SHORT,
+              gravity: Toast.TOP);
+        } else {
+          setState(() {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      ShipPage(phoneNumber: datauserShip['phone_login'])),
+            );
+          });
+        }
+      });
+    } else {
+      firestore
+          .collection("users")
+          .doc(phoneNumber.toString().startsWith("0")
+              ? phoneNumber.substring(1)
+              : phoneNumber)
+          .get()
+          .then((querySnapshot) {
+        dataUser = querySnapshot.data();
+        print(dataUser);
+        print(status);
+        if (dataUser == null) {
+          setState(() {
+            status = true;
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => VerifyPhone(
+                      phoneNumber: phoneNumber.toString().startsWith("0")
+                          ? phoneNumber.substring(1)
+                          : phoneNumber)),
+            );
+          });
+        } else {
+          setState(() {
+            status = false;
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MainPage(
+                      phoneNumber: phoneNumber.toString().startsWith("0")
+                          ? phoneNumber.substring(1)
+                          : phoneNumber)),
+            );
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //       builder: (context) => MainPage(
+            //           phoneNumber: phoneNumber.toString().startsWith("0")
+            //               ? phoneNumber.substring(1)
+            //               : phoneNumber)),
+            // );
+          });
+        }
+      });
+    }
   }
 
   void initState() {
@@ -173,30 +206,31 @@ class _LoginPhonePageState extends State<LoginPhonePage> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        if (phoneNumber.length > 10) {
-                          Toast.show("Số điện thoại không tồn tại", context,
-                              textColor: Colors.red,
-                              backgroundColor: Colors.grey,
-                              duration: Toast.LENGTH_SHORT,
-                              gravity: Toast.TOP);
-                        } else {
-                          getData();
-                          // status == true
-                          //         context,
-                          //         MaterialPageRoute(
-                          //             builder: (context) => MainPage()),
-                          //       )
-                          //     : Navigator.push(
-                          //         context,
-                          //         MaterialPageRoute(
-                          //             builder: (context) => VerifyPhone(
-                          //                 phoneNumber: phoneNumber
-                          //                         .toString()
-                          //                         .startsWith("0")
-                          //                     ? phoneNumber.substring(1)
-                          //                     : phoneNumber)),
-                          //       );
-                        }
+                        getData();
+                        // if (phoneNumber.length > 10) {
+                        //   Toast.show("Số điện thoại không tồn tại", context,
+                        //       textColor: Colors.red,
+                        //       backgroundColor: Colors.grey,
+                        //       duration: Toast.LENGTH_SHORT,
+                        //       gravity: Toast.TOP);
+                        // } else {
+                        //   getData();
+                        //   // status == true
+                        //   //         context,
+                        //   //         MaterialPageRoute(
+                        //   //             builder: (context) => MainPage()),
+                        //   //       )
+                        //   //     : Navigator.push(
+                        //   //         context,
+                        //   //         MaterialPageRoute(
+                        //   //             builder: (context) => VerifyPhone(
+                        //   //                 phoneNumber: phoneNumber
+                        //   //                         .toString()
+                        //   //                         .startsWith("0")
+                        //   //                     ? phoneNumber.substring(1)
+                        //   //                     : phoneNumber)),
+                        //   //       );
+                        // }
                       },
                       child: Container(
                         decoration: BoxDecoration(
