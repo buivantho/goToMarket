@@ -73,9 +73,9 @@ class _ShipComponentState extends State<ShipComponent> {
   }
 
   void deliveryStatus(phoneUser) {
-    print(phoneUser.toString());
-    print(indexService);
-    print(objIdService[indexService]);
+    // print(phoneUser.toString());
+    // print(indexService);
+    // print(objIdService[indexService]);
     FirebaseFirestore.instance
         .collection('products')
         .doc(phoneUser.toString())
